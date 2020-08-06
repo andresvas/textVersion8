@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.todo1.plugins.DetectIdPlugin" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0">
+    <name>DetectIdPlugin</name>
+    <js-module name="DetectIdPlugin" src="www/DetectIdPlugin.js">
+        <clobbers target="cordova.plugins.DetectIdPlugin"/>
+    </js-module>
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="DetectIdPlugin">
+                <param name="android-package" value="com.todo1.plugins.detectid.DetectIdPlugin"/>
+            </feature>
+        </config-file>
+        <config-file parent="/manifest/application" target="AndroidManifest.xml"></config-file>
+        <config-file parent="/manifest" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+            <uses-permission android:name="android.permission.WAKE_LOCK"/>
+            <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+            <uses-feature android:name="android.hardware.telephony" android:required="false"/>
+            <uses-feature android:name="android.hardware.wifi" android:required="false"/>
+        </config-file>
+        <source-file src="src/android/DetectIdPlugin.java" target-dir="src/com/todo1/plugins/detectid"/>
+        <framework custom="true" src="src/android/detectIdPlugin.gradle" type="gradleReference"/>
+        <resource-file src="src/android/libs/did-encryptor-8.2.0.aar" target="libs/did-encryptor-8.2.0.aar"/>
+        <resource-file src="src/android/libs/did-data-8.2.0.aar" target="libs/did-data-8.2.0.aar"/>
+        <resource-file src="src/android/libs/didm_authenticator_sdk_v8.2.0.aar" target="libs/didm_authenticator_sdk_v8.2.0.aar"/>
+        <resource-file src="src/android/libs/did-tokens-8.2.0.aar" target="libs/did-tokens-8.2.0.aar"/>
+        <resource-file src="src/android/libs/mobile-commons-1.0.0.aar" target="libs/mobile-commons-1.0.0.aar"/>
+        <resource-file src="src/android/libs/shortcut-1.0.0.aar" target="libs/shortcut-1.0.0.aar"/>
+    </platform>
+
+    <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+            <feature name="DetectIdPlugin">
+                <param name="ios-package" value="DetectIdPlugin"/>
+            </feature>
+        </config-file>
+        <source-file src="src/ios/DetectIdPlugin.m"/>
+        <header-file src="src/ios/DetectIdPlugin.h"/>
+
+        <framework src="src/ios/detectIdSdk/did_sdk_tokens_ios.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/did_sdk_encrypt_iOS.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/did_sdk_data_ios.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/didm_auth_sdk_iOS.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/did_sdk_challengeotp_ios.framework" custom="true" embed="true"/>
+         <framework src="src/ios/detectIdSdk/did_sdk_offline_ios.framework" custom="true" embed="true"/>
+ 
+        <framework src="src/ios/detectIdSdk/SelfID/FaceDetector.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/SelfID/SDK.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/SelfID/Liveness.framework" custom="true" embed="true"/>
+
+        <framework src="AVFoundation.framework"/>
+        <framework src="AudioToolbox.framework"/>
+        <framework src="CoreMedia.framework"/>
+        <framework src="CoreVideo.framework"/>
+        <framework src="libiconv.tbd"/>
+        <framework src="QuartzCore.framework"/>
+        <framework src="LocalAuthentication.framework"/>
+        <framework src="SystemConfiguration.framework"/>
+        <framework src="libsqlite3.tbd"/>
+
+        <hook type="before_plugin_install" src="hooks/ios_build_config.js"/>
+        <hook type="after_plugin_install" src="hooks/ios_embed_framework_hook.js"/>
+
+    </platform>
+</plugin>

@@ -1,0 +1,16 @@
+repositories {
+    flatDir {
+        dirs 'libs'
+        dirs 'src/main/libs'
+    }
+}
+
+dependencies {
+    // Incluye los archivos .aar y .jar de DetectID SDK y SelfID
+    compile(name: 'didm_authenticator_sdk_v8.2.0', ext: 'aar')
+    compile(name: 'did-encryptor-8.2.0', ext: 'aar')
+    compile(name: 'did-data-8.2.0', ext: 'aar')
+    compile(name: 'did-tokens-8.2.0', ext: 'aar')
+    compile(name: 'mobile-commons-1.0.0', ext: 'aar')
+    compile(name: 'shortcut-1.0.0', ext: 'aar')
+}
