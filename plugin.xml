@@ -25,6 +25,8 @@
 
         <dependency id="cordova-androidx-build" url="https://github.com/cmfsotelo/cordova-androidx-build.git#1.0-OS.1" />
 
+         <hook type="after_plugin_install" src="hooks/android_enable_androidx.js"/>
+
         
         <source-file src="src/android/DetectIdPlugin.java" target-dir="src/com/todo1/plugins/detectid"/>
         <framework custom="true" src="src/android/detectIdPlugin.gradle" type="gradleReference"/>
