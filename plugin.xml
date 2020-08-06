@@ -21,12 +21,18 @@
             <uses-feature android:name="android.hardware.telephony" android:required="false"/>
             <uses-feature android:name="android.hardware.wifi" android:required="false"/>
         </config-file>
+
+
+        <dependency id="cordova-androidx-build" url="https://github.com/cmfsotelo/cordova-androidx-build.git#1.0-OS.1" />
+
+        
         <source-file src="src/android/DetectIdPlugin.java" target-dir="src/com/todo1/plugins/detectid"/>
         <framework custom="true" src="src/android/detectIdPlugin.gradle" type="gradleReference"/>
         <resource-file src="src/android/libs/did-encryptor-8.2.0.aar" target="libs/did-encryptor-8.2.0.aar"/>
         <resource-file src="src/android/libs/did-data-8.2.0.aar" target="libs/did-data-8.2.0.aar"/>
         <resource-file src="src/android/libs/didm_authenticator_sdk_v8.2.0.aar" target="libs/didm_authenticator_sdk_v8.2.0.aar"/>
         <resource-file src="src/android/libs/did-tokens-8.2.0.aar" target="libs/did-tokens-8.2.0.aar"/>
+        <resource-file src="src/android/libs/did-offline-8.2.0.aar" target="libs/did-offline-8.2.0.aar"/>
         <resource-file src="src/android/libs/mobile-commons-1.0.0.aar" target="libs/mobile-commons-1.0.0.aar"/>
         <resource-file src="src/android/libs/shortcut-1.0.0.aar" target="libs/shortcut-1.0.0.aar"/>
     </platform>

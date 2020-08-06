@@ -11,6 +11,7 @@ dependencies {
     compile(name: 'did-encryptor-8.2.0', ext: 'aar')
     compile(name: 'did-data-8.2.0', ext: 'aar')
     compile(name: 'did-tokens-8.2.0', ext: 'aar')
+    compile(name: 'did-offline-8.2.0', ext: 'aar')
     compile(name: 'mobile-commons-1.0.0', ext: 'aar')
     compile(name: 'shortcut-1.0.0', ext: 'aar')
 }
