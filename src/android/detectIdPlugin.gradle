@@ -14,4 +14,30 @@ dependencies {
     compile(name: 'did-offline-8.2.0', ext: 'aar')
     compile(name: 'mobile-commons-1.0.0', ext: 'aar')
     compile(name: 'shortcut-1.0.0', ext: 'aar')
+
+
+    // Dependencias requeridas por Android
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0'
+
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation'androidx.mediarouter:mediarouter:1.1.0'
+    implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
+
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+    //implementation 'com.google.firebase:firebase-core:17.2.0'
+    //implementation "com.google.firebase:firebase-messaging:20.0.0"
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.2'
+
+    implementation 'com.google.dagger:dagger:2.25.2'
+    implementation 'com.google.dagger:dagger-android-support:2.13'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
 }

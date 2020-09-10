@@ -53,11 +53,18 @@
         <framework src="src/ios/detectIdSdk/did_sdk_data_ios.framework" custom="true" embed="true"/>
         <framework src="src/ios/detectIdSdk/didm_auth_sdk_iOS.framework" custom="true" embed="true"/>
         <framework src="src/ios/detectIdSdk/did_sdk_challengeotp_ios.framework" custom="true" embed="true"/>
-         <framework src="src/ios/detectIdSdk/did_sdk_offline_ios.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/did_sdk_offline_ios.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/did_sdk_deviceInfo_iOS.framework" custom="true" embed="true"/>
+        <framework src="src/ios/detectIdSdk/did_sdk_server_communication_iOS.framework" custom="true" embed="true"/>
  
-        <framework src="src/ios/detectIdSdk/SelfID/FaceDetector.framework" custom="true" embed="true"/>
+       
         <framework src="src/ios/detectIdSdk/SelfID/SDK.framework" custom="true" embed="true"/>
         <framework src="src/ios/detectIdSdk/SelfID/Liveness.framework" custom="true" embed="true"/>
+
+
+        <!--<framework src="src/ios/detectIdSdk/SelfID/FaceDetector.framework" custom="true" embed="true"/>
+        -->
+
 
         <framework src="AVFoundation.framework"/>
         <framework src="AudioToolbox.framework"/>
