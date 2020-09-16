@@ -30,6 +30,7 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
     private CallbackContext callbackContext;
     String codeServerUrl = "https://otp.bancolombia.com/detect/public/registration/mobileServices.htm?code=";
 
+    // PUSH ID 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
