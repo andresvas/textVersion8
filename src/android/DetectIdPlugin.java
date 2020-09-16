@@ -1,7 +1,7 @@
 package com.todo1.plugins.detectid;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import net.easysol.did.DetectID;
@@ -28,11 +28,13 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
     final String NO_INIT_ERROR = "SDK not initialized";
     private final String TAG = "DetectIdPlugin";
     private CallbackContext callbackContext;
+    String codeServerUrl = "https://otp.bancolombia.com/detect/public/registration/mobileServices.htm?code=";
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
+
         detectIDSdk.INBOX_API.automaticResetBadgeNumber(false);
     }
 
@@ -127,12 +129,17 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
     private void initSdk(final CallbackContext callbackContext, JSONArray args) throws JSONException {
         String serverURL = args.getString(0);
         Log.d(TAG, "Initializing DetectId SDK with serverKey: " + serverURL);
-        InitParams initParams = new InitParams.InitParamsBuilder()
+
+       /* InitParams initParams = new InitParams.InitParamsBuilder() // TODO deprecated
                 .addDidUrl(serverURL)
                 .build();
-        DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
-        detectIDSdk.initDIDServerWithParams(initParams);
+        DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());*/
+
+       // detectIDSdk.initDIDServerWithParams(initParams);
         //initServerWithUrl(serverURL);
+
+        DetectID.sdk(cordova.getActivity()).didInit();
+
         callbackContext.success();
     }
 
@@ -183,22 +190,22 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
         }
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
         detectIDSdk.setDeviceRegistrationServerResponseListener(this);
-        detectIDSdk.enableRegistrationServerResponseAlerts(false);
-        detectIDSdk.deviceRegistrationByCode(code);
-
+        //detectIDSdk.enableRegistrationServerResponseAlerts(false); TODO: deprecated
+        //detectIDSdk.deviceRegistrationByCode(code);  TODO: deprecated and replace for new method didRegistration
+        detectIDSdk.didRegistration(codeServerUrl + code);
         PluginResult pr = new PluginResult(PluginResult.Status.NO_RESULT);
         pr.setKeepCallback(true);
         callbackContext.sendPluginResult(pr);
     }
 
     private boolean isSdkInitialized() {
-        return true;//!SharedPreferencesBuilder.getPreferencesValue(cordova.getActivity(), "server_did", "").isEmpty();
+        return true; //!SharedPreferencesBuilder.getPreferencesValue(cordova.getActivity(), "server_did", "").isEmpty(); // TODO question for DetectID
     }
 
     //SYNC METHOD
     private void enableRegistrationAlert(CallbackContext callbackContext, boolean enable) {
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
-        detectIDSdk.enableRegistrationServerResponseAlerts(enable);
+       // detectIDSdk.enableRegistrationServerResponseAlerts(enable); // TODO: pending...
         callbackContext.success();
     }
 

@@ -15,7 +15,7 @@ bool isRunning = false;
 CDVInvokedUrlCommand* lastCallback;
 
 - (void)pluginInitialize{
-    [[DetectID sdk] enableRegistrationServerResponseAlerts:false];
+    //[[DetectID sdk] enableRegistrationServerResponseAlerts:false]; DEPRECATED
     [[DetectID sdk] enableSecureCertificateValidationProtocol:false];
     [[DetectID sdk] OTP_API];
 }
@@ -24,10 +24,11 @@ CDVInvokedUrlCommand* lastCallback;
     [self.commandDelegate runInBackground:^{
         if( [command.arguments count] == 1 && [command.arguments objectAtIndex:0] != (id)[NSNull null]){
             lastCallback = command;
-            InitParams *params = [[[InitParamsBuilder new] buildDidUrl:[command.arguments objectAtIndex:0]] buildParams];
+            //InitParams *params = [[[InitParamsBuilder new] buildDidUrl:[command.arguments objectAtIndex:0]] buildParams]; DISABLED
 
-            [[DetectID sdk] initDIDServerWithParams: (InitParams *) params ];
-
+           // [[DetectID sdk] initDIDServerWithParams: (InitParams *) params ];
+            [[DetectID sdk] didInit];
+            
             mMobileAPIInitialized = true;
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -42,10 +43,14 @@ CDVInvokedUrlCommand* lastCallback;
         lastCallback = command;
         [[DetectID sdk] setDeviceRegistrationServerResponseDelegate:(id)self];
 
-        [[DetectID sdk] enableRegistrationServerResponseAlerts:false];
+        #pragma mark To do: review this method TODO1.
+       // [[DetectID sdk] enableRegistrationServerResponseAlerts:false]; DEPRECATED
         [[DetectID sdk] enableSecureCertificateValidationProtocol:false];
 
-        [[DetectID sdk] deviceRegistrationByCode:[command.arguments objectAtIndex:0]];
+       // [[DetectID sdk] deviceRegistrationByCode:[command.arguments objectAtIndex:0]]; DEPRECATED
+        NSString *finalURL = [NSString stringWithFormat:@"%@%@", @"https://otp.bancolombia.com/detect/public/registration/mobileServices.htm?code=", [command.arguments objectAtIndex:0]] ;
+        [[DetectID sdk] didRegistrationWithUrl:finalURL];
+        
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [pluginResult setKeepCallback: [NSNumber numberWithInt:1]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
