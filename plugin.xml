@@ -23,6 +23,34 @@
         </config-file>
 
 
+        <!-- added activities and services what let work the push notifications -->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- Push Activities -->
+            <activity android:name="net.easysol.did.push_auth.transaction.PushTransactionActivity" android:exported="true"
+                android:theme="@android:style/Theme.Dialog" />
+            <activity android:name="net.easysol.did.push_auth.alert.PushAlertActivity" android:exported="true" android:theme="@android:style/Theme.Dialog" />
+            <!-- End Push Activities -->
+
+            <!-- Push services -->
+            <service android:name="net.easysol.did.firebase_service.InstanceIDListenerService">
+                <intent-filter>
+                    <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                </intent-filter>
+            </service>
+
+
+            <service android:name="net.easysol.did.firebase_service.FirebaseGCMReceiverService">
+                <intent-filter>
+                    <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                </intent-filter>
+            </service>
+            <!-- Push quick actions broadcast-->
+            <receiver android:name="net.easysol.did.push_auth.transaction.broadcast.ConfirmPushTransactionBroadcast" />
+            <receiver android:name="net.easysol.did.push_auth.transaction.broadcast.DeclinePushTransactionBroadcast" />
+            <!-- End Push services -->
+        </config-file>
+
+
         <dependency id="cordova-androidx-build" url="https://github.com/cmfsotelo/cordova-androidx-build.git#1.0-OS.1" />
 
          <hook type="after_plugin_install" src="hooks/android_enable_androidx.js"/>
