@@ -5,6 +5,7 @@ repositories {
     }
 }
 
+
 dependencies {
     // Incluye los archivos .aar y .jar de DetectID SDK y SelfID
     compile(name: 'didm_authenticator_sdk_v8.2.0', ext: 'aar')
@@ -28,9 +29,15 @@ dependencies {
 
 
     implementation 'androidx.multidex:multidex:2.0.1'
-    //implementation 'com.google.firebase:firebase-core:17.2.0'
-    //implementation "com.google.firebase:firebase-messaging:20.0.0"
     implementation 'com.google.code.gson:gson:2.8.5'
+    
+    //Soporte para mensajería Push basada en la nube
+    implementation 'com.google.firebase:firebase-core:17.5.0'
+    implementation "com.google.firebase:firebase-messaging:20.2.4"
+
+    // is necessary due without this dependency not permit compile
+    implementation "com.google.android.gms:play-services-analytics:17.0.0"
+
 
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'

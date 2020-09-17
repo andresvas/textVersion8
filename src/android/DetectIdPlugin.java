@@ -2,7 +2,11 @@ package com.todo1.plugins.detectid;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
+import android.content.DialogInterface;
 import android.util.Log;
+import android.widget.Toast;
 
 import net.easysol.did.DetectID;
 //import net.easysol.did.application.DeviceFingerprintValidate;
@@ -11,6 +15,11 @@ import net.easysol.did.common.account.Account;
 //import net.easysol.did.common.account.AccountController;
 import net.easysol.did.common.model.contract.InitParams;
 import net.easysol.did.common.registration.listener.DeviceRegistrationServerResponseListener;
+import net.easysol.did.common.transaction.TransactionInfo;
+import net.easysol.did.push_auth.transaction.listener.PushTransactionOpenListener;
+import net.easysol.did.push_auth.transaction.listener.PushTransactionReceivedListener;
+import net.easysol.did.push_auth.transaction.listener.PushTransactionServerResponseListener;
+import net.easysol.did.push_auth.transaction.views.PushTransactionViewProperties;
 //import net.easysol.did.otp_auth.TokenController;
 
 import org.apache.cordova.CallbackContext;
@@ -24,13 +33,14 @@ import org.json.JSONException;
 import java.util.Date;
 import java.util.List;
 
+import static com.appsflyer.AppsFlyerLibCore.LOG_TAG;
+
 public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationServerResponseListener {
     final String NO_INIT_ERROR = "SDK not initialized";
     private final String TAG = "DetectIdPlugin";
     private CallbackContext callbackContext;
     String codeServerUrl = "https://otp.bancolombia.com/detect/public/registration/mobileServices.htm?code=";
 
-    // PUSH ID 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
@@ -140,48 +150,12 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
         //initServerWithUrl(serverURL);
 
         DetectID.sdk(cordova.getActivity()).didInit();
+        DetectID.sdk(cordova.getContext()).PUSH_API.enablePushTransactionDefaultDialog (true); //TODO: enable if notification is managed default or custom
+        DetectID.sdk(cordova.getActivity()).PUSH_API.enablePushTransactionServerResponseAlerts(true); // TODO: enable or disable if show alerts type TOAST when server response
 
         callbackContext.success();
     }
 
-    /**
-     * This is a workaround method to the typical initDIDServerWithParams(initParams).
-     * This was needed to prevent the call of the Get request that validates if the sdk is supported. I think this url fails to resolve, giving timeout after a really long period.
-     *
-     * @param serverUrl
-     *//**
-     * This is a workaround method to the typical initDIDServerWithParams(initParams).
-     * This was needed to prevent the call of the Get request that validates if the sdk is supported. I think this url fails to resolve, giving timeout after a really long period.
-     *®
-     * @param //serverUrl
-     */
-    /*private void initServerWithUrl(String serverUrl) {
-        Context myContext = cordova.getActivity();
-        // validationDeviceFingerprint
-        if (!SharedPreferencesBuilder.containsPreferenceKey(myContext, "fingerprint_valid")) {
-            DeviceFingerprintValidate deviceFingerprintValidate = new DeviceFingerprintValidate(myContext);
-            deviceFingerprintValidate.validateAccounts();
-        }
-        // setSdkVersionTag
-        SharedPreferencesBuilder.setPreferenceValue(myContext, "sdk_version", "7.2.0");
-
-        // setLegacyAccounts()
-        if (!SharedPreferencesBuilder.getPreferencesValue(myContext, "convert_legacy_accounts", false)) {
-            TokenController.getInstance(myContext).protectLegacySeeds();
-            AccountController.getInstance(myContext).convertLegacyAccounts();
-            SharedPreferencesBuilder.setPreferenceValue(myContext, "convert_legacy_accounts", true);
-        }
-
-        // setLegacyAccountsV135()
-        if (!SharedPreferencesBuilder.getPreferencesValue(myContext, "convert_legacy_accounts_v135", false)) {
-            AccountController.getInstance(myContext).convertLegacyAccountsV135();
-            SharedPreferencesBuilder.setPreferenceValue(myContext, "convert_legacy_accounts_v135", true);
-        }
-
-        // validateSdkSupportVersion
-        SharedPreferencesBuilder.setPreferenceValue(myContext, "IS_SDK_SUPPORTED_VERSION", true);
-        SharedPreferencesBuilder.setPreferenceValue(myContext, "server_did", serverUrl);
-    }*/
 
     //ASYNC METHOD
     private void registerDeviceByCode(CallbackContext callbackContext, String code) throws JSONException {
@@ -316,6 +290,122 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
             callbackContext.success(s);
         }
     }
+
+
+    // ------------------- Start PUSH ID - autenticacion por mensajeria push ------------------------- //
+
+    /**
+     * this method custom the notification
+     */
+    private void customNotification() {
+        PushTransactionViewProperties properties = DetectID.sdk(cordova.getContext()).getPushTransactionViewPropertiesInstance();
+        // properties.NOTIFICATION_ICON_RESOURCE = android.R.drawable.stat_sys_warning; properties.CONFIRM = "Confirm";
+        // properties.DECLINE = "Decline"; TODO: so is how is defined in document
+
+        properties.setConfirmIconResource(android.R.drawable.stat_sys_warning);
+        properties.setConfirm("Aceptar");
+        properties.setDecline("Rechazar");
+    }
+
+    /**
+     * this method contain the listener of the response from server
+     */
+    private void responseFromServerNotification() {
+        DetectID.sdk(cordova.getContext()).PUSH_API.setPushTransactionServerResponseListener(new PushTransactionServerResponseListener() {
+            @Override
+            public void onPushTransactionServerResponse(String s) {
+                String message = "1020: " + "Code response: onPushTransactionServerResponse";
+                Toast.makeText(cordova.getContext(), message, Toast.LENGTH_SHORT).show();
+                //showAuthenticationMessage(message);
+            }
+        });
+    }
+
+    /**
+     * this method is run when the app received the notification
+     */
+    private void authenticationReceivedProcess() {
+        DetectID.sdk(cordova.getContext()).PUSH_API.setPushTransactionReceivedListener(new PushTransactionReceivedListener() {
+            @Override
+            public void onPushTransactionReceived(TransactionInfo transactionInfo) {
+                Log.i(LOG_TAG, "Notification received");
+            }
+        });
+    }
+
+    /**
+     * this method is helpful when it want implement a message and actions with information about transaction
+     */
+    private void authenticationNotificationOpenProcess() {
+        DetectID.sdk(cordova.getContext()).PUSH_API.setPushTransactionOpenListener(new PushTransactionOpenListener() {
+            @Override
+            public void onPushTransactionOpen(TransactionInfo info) {
+                final TransactionInfo transaction = info;
+                Context context = cordova.getContext();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context); builder.setTitle(buildTitle(transaction));
+                builder.setMessage(buildMessage(transaction));
+                builder.setPositiveButton("Confirm",
+                        new DialogInterface.OnClickListener() { @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DetectID.sdk(context).PUSH_API.confirmPushTransactionAction(transaction); }
+                        });
+                builder.setNegativeButton("Decline",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DetectID.sdk(context).PUSH_API.declinePushTransactionAction(transaction); }
+                        }); builder.create();
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+    }
+
+
+    /**
+     * got message from object info
+     *
+     * @param transactionInfo transactionInfo
+     * @return message
+     */
+    private String buildTitle(TransactionInfo transactionInfo) {
+        if (transactionInfo != null) {
+            return transactionInfo.account.organizationName + "\n";
+        } else {
+            return "No title...";
+        }
+    }
+
+    /**
+     * this method of example
+     * @param transactionInfo info push
+     * @return message
+     */
+    private String buildMessage(TransactionInfo transactionInfo) {
+        if (transactionInfo != null) {
+            StringBuilder message = new StringBuilder();
+            message.append("message :");
+            message.append(transactionInfo.message);
+            return message.toString();
+        } else {
+            return "not included message";
+        }
+    }
+
+
+    /**
+     * this method is for add information extra of the notification
+     */
+    public void addInformation() { // TODO: pending review
+        // DetectID.sdk(cordova.getActivity()).PUSH_API.setPushAuthenticationResponseAdditionalInfo(Map<String , String> additionalInfo);
+    }
+
+
+
+
+    // ------------------- End PUSH ID - autenticacion por mensajeria push ------------------------- //
+
+
 
     public enum Action {
         INIT,
