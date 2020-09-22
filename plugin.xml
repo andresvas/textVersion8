@@ -75,6 +75,9 @@
         </config-file>
         <source-file src="src/ios/DetectIdPlugin.m"/>
         <header-file src="src/ios/DetectIdPlugin.h"/>
+        
+        <header-file src="src/ios/AppDelegate+notification.h" />
+        <source-file src="src/ios/AppDelegate+notification.m" />
 
         <framework src="src/ios/detectIdSdk/did_sdk_tokens_ios.framework" custom="true" embed="true"/>
         <framework src="src/ios/detectIdSdk/did_sdk_encrypt_iOS.framework" custom="true" embed="true"/>
