@@ -5,7 +5,7 @@
 //  Created by Andres Felipe Vasquez Saldarriaga on 22/09/20.
 //
 
-#import "AppDelegate+notification.h"
+#import "appDelegate+notification.h"
 //#import "PushPlugin.h"
 #import <objc/runtime.h>
 //#import <didm_auth_sdk_iOS/didm_auth_sdk_iOS.h>
@@ -87,6 +87,24 @@
 }
 
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error{ //management error
+    
+    UIWindow* topWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    topWindow.rootViewController = [UIViewController new];
+    topWindow.windowLevel = UIWindowLevelAlert + 1;
+
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"APNS" message:@"ERROR T1" preferredStyle:UIAlertControllerStyleAlert];
+
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK",@"confirm") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        // continue your work
+
+        // important to hide the window after work completed.
+        // this also keeps a reference to the window until the action is invoked.
+        topWindow.hidden = YES; // if you want to hide the topwindow then use this
+        //topWindow = nil; // if you want to remove the topwindow then use this
+    }]];
+
+    [topWindow makeKeyAndVisible];
+    [topWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
