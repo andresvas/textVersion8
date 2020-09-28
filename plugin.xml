@@ -54,10 +54,21 @@
         <dependency id="cordova-androidx-build" url="https://github.com/cmfsotelo/cordova-androidx-build.git#1.0-OS.1" />
 
          <hook type="after_plugin_install" src="hooks/android_enable_androidx.js"/>
+        <hook type="after_plugin_install" src="hooks/android/after_plugin_install.js" />
+        <hook type="before_plugin_uninstall" src="hooks/android/before_plugin_uninstall.js" />
+
+         <!-- unzip google services -->
+         <hook type="before_plugin_install" src="hooks/configurations/installDependencies.js" />
+         <hook type="before_plugin_install" src="hooks/configurations/unzipAndCopyConfigurations.js" />
+
 
         
         <source-file src="src/android/DetectIdPlugin.java" target-dir="src/com/todo1/plugins/detectid"/>
+
         <framework custom="true" src="src/android/detectIdPlugin.gradle" type="gradleReference"/>
+        <framework src="com.google.gms:google-services:4.3.3" />
+
+
         <resource-file src="src/android/libs/did-encryptor-8.2.0.aar" target="libs/did-encryptor-8.2.0.aar"/>
         <resource-file src="src/android/libs/did-data-8.2.0.aar" target="libs/did-data-8.2.0.aar"/>
         <resource-file src="src/android/libs/didm_authenticator_sdk_v8.2.0.aar" target="libs/didm_authenticator_sdk_v8.2.0.aar"/>
@@ -75,7 +86,7 @@
         </config-file>
         <source-file src="src/ios/DetectIdPlugin.m"/>
         <header-file src="src/ios/DetectIdPlugin.h"/>
-        
+
         <header-file src="src/ios/AppDelegate+notification.h" />
         <source-file src="src/ios/AppDelegate+notification.m" />
 

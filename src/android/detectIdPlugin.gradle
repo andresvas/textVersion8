@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.google.gms:google-services:4.3.3'
+    }
+}
+
+
 repositories {
     flatDir {
         dirs 'libs'
@@ -48,3 +59,7 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'
 }
+
+cdvPluginPostBuildExtras.add({
+  apply plugin: 'com.google.gms.google-services'
+})
