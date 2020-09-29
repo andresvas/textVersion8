@@ -54,6 +54,9 @@
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
        NSLog(@"VASQUEZ: %@", [self stringWithDeviceToken:deviceToken]);
+
+       UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.string = [self stringWithDeviceToken:deviceToken];
     
     UIWindow* topWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     topWindow.rootViewController = [UIViewController new];
