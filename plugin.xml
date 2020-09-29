@@ -69,6 +69,9 @@
         <framework src="com.google.gms:google-services:4.3.3" />
 
 
+        <framework src="com.google.firebase:firebase-messaging:20.2.4" />
+
+
         <resource-file src="src/android/libs/did-encryptor-8.2.0.aar" target="libs/did-encryptor-8.2.0.aar"/>
         <resource-file src="src/android/libs/did-data-8.2.0.aar" target="libs/did-data-8.2.0.aar"/>
         <resource-file src="src/android/libs/didm_authenticator_sdk_v8.2.0.aar" target="libs/didm_authenticator_sdk_v8.2.0.aar"/>

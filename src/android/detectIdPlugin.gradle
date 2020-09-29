@@ -1,12 +1,4 @@
-buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.google.gms:google-services:4.3.3'
-    }
-}
+
 
 
 repositories {
@@ -44,7 +36,7 @@ dependencies {
     
     //Soporte para mensajería Push basada en la nube
     implementation 'com.google.firebase:firebase-core:17.5.0'
-    implementation "com.google.firebase:firebase-messaging:20.2.4"
+    //implementation "com.google.firebase:firebase-messaging:20.2.4"
 
     // is necessary due without this dependency not permit compile
     implementation "com.google.android.gms:play-services-analytics:17.0.0"
