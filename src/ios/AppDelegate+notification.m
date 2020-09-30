@@ -5,7 +5,7 @@
 //  Created by Andres Felipe Vasquez Saldarriaga on 22/09/20.
 //
 
-#import "appDelegate+notification.h"
+#import "AppDelegate+notification.h"
 //#import "PushPlugin.h"
 #import <objc/runtime.h>
 //#import <didm_auth_sdk_iOS/didm_auth_sdk_iOS.h>
