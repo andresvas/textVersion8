@@ -18,6 +18,8 @@
             <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
             <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+            <uses-permission android:name="android.permission.EXPAND_STATUS_BAR"/>
+            <uses-permission android:name="android.permission.VIBRATE" />
             <uses-feature android:name="android.hardware.telephony" android:required="false"/>
             <uses-feature android:name="android.hardware.wifi" android:required="false"/>
         </config-file>
@@ -25,9 +27,13 @@
 
         <!-- added activities and services what let work the push notifications -->
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <!-- updateDevice service -->
+
+            <service android:name="net.easysol.did.services.UpdateDeviceInformationService" />
+
+            <!-- end updateDevice service -->
             <!-- Push Activities -->
-            <activity android:name="net.easysol.did.push_auth.transaction.PushTransactionActivity" android:exported="true"
-                android:theme="@android:style/Theme.Dialog" />
+            <activity android:name="net.easysol.did.push_auth.transaction.PushTransactionActivity" android:exported="true" android:theme="@android:style/Theme.Dialog" />
             <activity android:name="net.easysol.did.push_auth.alert.PushAlertActivity" android:exported="true" android:theme="@android:style/Theme.Dialog" />
             <!-- End Push Activities -->
 
@@ -72,12 +78,12 @@
         <framework src="com.google.firebase:firebase-messaging:20.2.4" />
 
 
-        <resource-file src="src/android/libs/did-encryptor-8.2.0.aar" target="libs/did-encryptor-8.2.0.aar"/>
-        <resource-file src="src/android/libs/did-data-8.2.0.aar" target="libs/did-data-8.2.0.aar"/>
-        <resource-file src="src/android/libs/didm_authenticator_sdk_v8.2.0.aar" target="libs/didm_authenticator_sdk_v8.2.0.aar"/>
-        <resource-file src="src/android/libs/did-tokens-8.2.0.aar" target="libs/did-tokens-8.2.0.aar"/>
-        <resource-file src="src/android/libs/did-offline-8.2.0.aar" target="libs/did-offline-8.2.0.aar"/>
-        <resource-file src="src/android/libs/mobile-commons-1.0.0.aar" target="libs/mobile-commons-1.0.0.aar"/>
+        <resource-file src="src/android/libs/did-encryptor-8.3.0.aar" target="libs/did-encryptor-8.3.0.aar"/>
+        <resource-file src="src/android/libs/did-data-8.3.0.aar" target="libs/did-data-8.3.0.aar"/>
+        <resource-file src="src/android/libs/didm_authenticator_sdk_v8.3.0.aar" target="libs/didm_authenticator_sdk_v8.3.0.aar"/>
+        <resource-file src="src/android/libs/did-tokens-8.3.0.aar" target="libs/did-tokens-8.3.0.aar"/>
+        <resource-file src="src/android/libs/did-offline-8.3.0.aar" target="libs/did-offline-8.3.0.aar"/>
+        <!--<resource-file src="src/android/libs/mobile-commons-1.0.0.aar" target="libs/mobile-commons-1.0.0.aar"/>-->
         <resource-file src="src/android/libs/shortcut-1.0.0.aar" target="libs/shortcut-1.0.0.aar"/>
     </platform>
 
@@ -93,7 +99,7 @@
           <string>development</string>
         </config-file>
 
-        config-file parent="aps-environment" target="*/Entitlements-Release.plist">
+        <config-file parent="aps-environment" target="*/Entitlements-Release.plist">
           <string>production</string>
         </config-file> 
 
@@ -123,8 +129,7 @@
         <framework src="src/ios/detectIdSdk/SelfID/Liveness.framework" custom="true" embed="true"/>
 
 
-        <!--<framework src="src/ios/detectIdSdk/SelfID/FaceDetector.framework" custom="true" embed="true"/> pending
-        --> 
+        <!--<framework src="src/ios/detectIdSdk/SelfID/FaceDetector.framework" custom="true" embed="true"/>--> 
 
 
         <framework src="AVFoundation.framework"/>

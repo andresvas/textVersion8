@@ -13,7 +13,6 @@ import net.easysol.did.DetectID;
 //import net.easysol.did.application.utils.SharedPreferencesBuilder;
 import net.easysol.did.common.account.Account;
 //import net.easysol.did.common.account.AccountController;
-import net.easysol.did.common.model.contract.InitParams;
 import net.easysol.did.common.registration.listener.DeviceRegistrationServerResponseListener;
 import net.easysol.did.common.transaction.TransactionInfo;
 import net.easysol.did.push_auth.transaction.listener.PushTransactionOpenListener;
@@ -30,7 +29,6 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.Date;
 import java.util.List;
 
 import static com.appsflyer.AppsFlyerLibCore.LOG_TAG;
@@ -47,6 +45,8 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
 
         detectIDSdk.INBOX_API.automaticResetBadgeNumber(false);
+        enablePushAction();
+        listenerSDKPush();
     }
 
     @Override
@@ -140,15 +140,6 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
     private void initSdk(final CallbackContext callbackContext, JSONArray args) throws JSONException {
         String serverURL = args.getString(0);
         Log.d(TAG, "Initializing DetectId SDK with serverKey: " + serverURL);
-
-       /* InitParams initParams = new InitParams.InitParamsBuilder() // TODO deprecated
-                .addDidUrl(serverURL)
-                .build();
-        DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());*/
-
-       // detectIDSdk.initDIDServerWithParams(initParams);
-        //initServerWithUrl(serverURL);
-
         DetectID.sdk(cordova.getActivity()).didInit();
         DetectID.sdk(cordova.getContext()).PUSH_API.enablePushTransactionDefaultDialog (true); //TODO: enable if notification is managed default or custom
         DetectID.sdk(cordova.getActivity()).PUSH_API.enablePushTransactionServerResponseAlerts(true); // TODO: enable or disable if show alerts type TOAST when server response
@@ -159,23 +150,28 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
 
     //ASYNC METHOD
     private void registerDeviceByCode(CallbackContext callbackContext, String code) throws JSONException {
-        if (!isSdkInitialized()) {
+       /* if (!isSdkInitialized()) {
             callbackContext.error(NO_INIT_ERROR);
             return;
-        }
+        }*/
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
         detectIDSdk.setDeviceRegistrationServerResponseListener(this);
         //detectIDSdk.enableRegistrationServerResponseAlerts(false); TODO: deprecated
-        //detectIDSdk.deviceRegistrationByCode(code);  TODO: deprecated and replace for new method didRegistration
-        detectIDSdk.didRegistration(codeServerUrl + code);
-        PluginResult pr = new PluginResult(PluginResult.Status.NO_RESULT);
-        pr.setKeepCallback(true);
-        callbackContext.sendPluginResult(pr);
+        try {
+            detectIDSdk.didRegistration(codeServerUrl + code);
+        } catch (Exception e) {
+            Toast.makeText(cordova.getContext(), "OE", Toast.LENGTH_SHORT).show();
+
+            PluginResult pr = new PluginResult(PluginResult.Status.NO_RESULT);
+            pr.setKeepCallback(true);
+            callbackContext.sendPluginResult(pr);
+        }
     }
 
-    private boolean isSdkInitialized() {
-        return true; //!SharedPreferencesBuilder.getPreferencesValue(cordova.getActivity(), "server_did", "").isEmpty(); // TODO question for DetectID
-    }
+    // TODO: remember review this method because was use in older version of sdk and it is not disponible now
+    /*private boolean isSdkInitialized() {
+        return true; !SharedPreferencesBuilder.getPreferencesValue(cordova.getActivity(), "server_did", "").isEmpty(); // TODO question for DetectID
+    }*/
 
     //SYNC METHOD
     private void enableRegistrationAlert(CallbackContext callbackContext, boolean enable) {
@@ -223,10 +219,10 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
 
     //SYNC METHOD
     private void getAccounts(CallbackContext callbackContext) {
-        if (!isSdkInitialized()) {
+       /* if (!isSdkInitialized()) {
             callbackContext.error(NO_INIT_ERROR);
             return;
-        }
+        }*/
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
         JSONArray jsonArray = new JSONArray();
         List<Account> accounts = detectIDSdk.getAccounts();
@@ -238,20 +234,20 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
 
     //SYNC METHOD
     private void hasAccounts(CallbackContext callbackContext) {
-        if (!isSdkInitialized()) {
+        /*if (!isSdkInitialized()) {
             callbackContext.error(NO_INIT_ERROR);
             return;
-        }
+        }*/
         DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
         callbackContext.success("" + detectIDSdk.existAccounts());
     }
 
     //SYNC METHOD
     private void setAccountUsername(CallbackContext callbackContext, String oldName, String newName) {
-        if (!isSdkInitialized()) {
+       /* if (!isSdkInitialized()) {
             callbackContext.error(NO_INIT_ERROR);
             return;
-        }
+        }*/
         Account acc = getAccount(oldName);
         if (acc != null) {
             DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
@@ -264,10 +260,10 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
 
     //SYNC METHOD
     private void removeAccount(CallbackContext callbackContext, String jsonAccount) {
-        if (!isSdkInitialized()) {
+       /* if (!isSdkInitialized()) {
             callbackContext.error(NO_INIT_ERROR);
             return;
-        }
+        }*/
         Account acc = getAccount(jsonAccount);
         if (acc != null) {
             DetectID detectIDSdk = DetectID.sdk(cordova.getActivity());
@@ -314,8 +310,8 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
         DetectID.sdk(cordova.getContext()).PUSH_API.setPushTransactionServerResponseListener(new PushTransactionServerResponseListener() {
             @Override
             public void onPushTransactionServerResponse(String s) {
-                String message = "1020: " + "Code response: onPushTransactionServerResponse";
-                Toast.makeText(cordova.getContext(), message, Toast.LENGTH_SHORT).show();
+                String message = "Code response: onPushTransactionServerResponse: ";
+                Toast.makeText(cordova.getContext(), message + s, Toast.LENGTH_SHORT).show();
                 //showAuthenticationMessage(message);
             }
         });
@@ -400,8 +396,30 @@ public class DetectIdPlugin extends CordovaPlugin implements DeviceRegistrationS
         // DetectID.sdk(cordova.getActivity()).PUSH_API.setPushAuthenticationResponseAdditionalInfo(Map<String , String> additionalInfo);
     }
 
+    /**
+     * is for enable and disable the actions default at the sdk
+     */
+    private void enablePushAction() {
+        DetectID.sdk(cordova.getContext()).PUSH_API.enablePushAlertDefaultDialog(true);
+        DetectID.sdk(cordova.getContext()).PUSH_API.enablePushTransactionDefaultDialog(true);
+        DetectID.sdk(cordova.getContext()).PUSH_API.enablePushTransactionServerResponseAlerts(true);
 
+        // This method allows you to enable or disable the automatic processing of notifications by the SDK.
+        DetectID.sdk(cordova.getContext()).pushNotificationManagement(true);
 
+        DetectID.sdk(cordova.getContext()).INBOX_API.enableBadgeNumber(false);
+    }
+
+    /**
+     * this method initialize alls listener of push
+     */
+    private void listenerSDKPush() {
+        customNotification();
+        responseFromServerNotification();
+        authenticationReceivedProcess();
+        authenticationNotificationOpenProcess();
+
+    }
 
     // ------------------- End PUSH ID - autenticacion por mensajeria push ------------------------- //
 
