@@ -1,0 +1,197 @@
+pipeline {
+
+ agent { label 'didAgent'}
+
+ environment {
+    PROJECT = "didm_auth_sdk_iOS.xcodeproj"
+    SCHEME = "didm_auth_sdk_iOS"
+    SCHEME_TESTS = "didm_auth_sdk_iOSTests"
+    XCARCHIVE_DEPRECATED = "DIDDefaultDeprecated.xcarchive"
+    JUNIT_REPORTS = "junitReports"
+    XCPRETTY = "/usr/local/bin/xcpretty"
+    URL_TEAMS = "https://outlook.office.com/webhook/9b30ff33-93c6-4306-94b2-0539df38b6ee@b93e809a-49c5-4a0f-a606-82b846acc30d/JenkinsCI/dd978fb630824e41897649eaaa291b6c/572fabb9-363f-4ff0-8e0d-f60d16044ff7"
+  }
+
+parameters {
+     string(name:'object_kind', defaultValue:'Manual', description:'Object Kind: Push or Merge Request')
+     string(name:'user_name', defaultValue:'Manual', description:'Username who does the changes in the repo')
+     string(name:'user_email', defaultValue:'tmg-bog-didsdk@appgate.com', description:'User email')
+     string(name:'total_commits_count', defaultValue:'0', description:'Total commits done')
+     string(name:'commit_messages', defaultValue:'Manual', description:'Commit messages done')
+ }
+
+  triggers {
+    gitlab(
+      triggerOnPush: true,
+      triggerOnMergeRequest: true,
+      branchFilterType: "NameBasedFilter",
+      includeBranchesSpec: '${GIT_BRANCH}')
+  }
+
+  stages {
+      stage('Preparation') {
+        steps {
+          dir('Source') {
+            sh 'security unlock-keychain -p "detectidsdk" ${HOME}/Library/Keychains/login.keychain'
+            sh 'rm -rf Framework/*'
+            sh 'rm -rf ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/*'
+            sh 'rm -rf ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/AuthFactors/*'
+          }
+        }
+      }
+
+       stage('Update Libraries Simulator') {
+        steps {
+           sh 'Echo detectidsdk | rsync -avz -e ssh ${HOME_DIR}/workspace/iOS-Data_${GIT_BRANCH}*/Framework/Simulator/did_sdk_data_ios.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+           sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Encryptor_${GIT_BRANCH}*/Framework/Simulator/did_sdk_encrypt_iOS.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+           sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Server_${GIT_BRANCH}*/Framework/Simulator/did_sdk_server_communication_iOS.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+           sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Device_${GIT_BRANCH}*/Framework/Simulator/did_sdk_deviceInfo_iOS.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+          sh 'Echo detectidsdk | rsync -avz -e ssh ${HOME_DIR}/workspace/iOS-Challenge_${GIT_BRANCH}*/Framework/Simulator/did_sdk_challengeotp_ios.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/AuthFactors/'
+
+         sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Offline_${GIT_BRANCH}*/Framework/Simulator/did_sdk_offline_ios.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/AuthFactors/'
+        }
+      }
+
+      stage('Build Simulator') {
+          steps {
+            dir('Source/DID_Auth_SDK/didm_auth_sdk_iOS') {
+              echo 'Building iOS Project'
+              sh 'xcodebuild -project ${PROJECT} -scheme didm_auth_sdk_iOS -configuration "Release" -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 8" clean'
+              sh 'xcodebuild -project ${PROJECT} -scheme didm_auth_sdk_iOS -configuration "Release" -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 8" ONLY_ACTIVE_ARCH=NO ARCHS="i386 x86_64"'
+            }
+          }
+        }
+
+    stage('Update Libraries') {
+     steps {
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Data_${GIT_BRANCH}*/Framework/Devices/did_sdk_data_ios.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Encryptor_${GIT_BRANCH}*/Framework/Devices/did_sdk_encrypt_iOS.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Server_${GIT_BRANCH}*/Framework/Devices/did_sdk_server_communication_iOS.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Device_${GIT_BRANCH}*/Framework/Devices/did_sdk_deviceInfo_iOS.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/Core/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Challenge_${GIT_BRANCH}*/Framework/Devices/did_sdk_challengeotp_ios.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/AuthFactors/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Offline_${GIT_BRANCH}*/Framework/Devices/did_sdk_offline_ios.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/AuthFactors/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-Liveness_${GIT_BRANCH}*/Framework/Liveness.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/FaceID/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-FDetector_${GIT_BRANCH}*/Framework/FaceDetector.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/FaceID/'
+
+        sh 'Echo detectidsdk | rsync -avz -e ssh  ${HOME_DIR}/workspace/iOS-SelfID_${GIT_BRANCH}*/Framework/SDK.framework ${HOME_DIR}/workspace/iOS-DID-SDK_${GIT_BRANCH}*/Source/DID_Auth_SDK/didm_auth_sdk_iOS/didm_auth_sdk_iOS/external_library/FaceID/'
+     }
+   }
+
+    stage('Build') {
+        steps {
+          dir('Source/DID_Auth_SDK/didm_auth_sdk_iOS') {
+            echo 'Building iOS Project'
+            sh 'xcodebuild -project ${PROJECT} -scheme ${SCHEME} -configuration "Release" clean -destination generic/platform=iOS '
+            sh 'xcodebuild -project ${PROJECT} -scheme ${SCHEME} -configuration "Release" build ONLY_ACTIVE_ARCH=NO -destination generic/platform=iOS'
+          }
+        }
+      }
+
+    stage('Tests') {
+      steps {
+        dir('Source/DID_Auth_SDK/didm_auth_sdk_iOS') {
+            echo 'Testing Project'
+            sh '''
+            rm -rf connectedDevicesList.txt
+            rm -rf ../../Reports
+            rm -rf ${JUNIT_REPORTS}
+            instruments -s devices | grep "^QA" | cut -f 1 -d "(" >> connectedDevicesList.txt
+            while read device; do
+            file=`echo $device | tr -d ' '`
+            xcodebuild -project ${PROJECT} -scheme ${SCHEME_TESTS} -configuration "Debug" -destination platform=iOS,"name=${device}" OTHER_CODE_SIGN_FLAGS="--keychain jenkins-${JOB_NAME}" -enableCodeCoverage YES test | ${XCPRETTY} --report junit --output ${JUNIT_REPORTS}/${file}.xml
+            sed -i.back -e "s/${SCHEME_TESTS}/${SCHEME_TESTS}-${file}/g" ${JUNIT_REPORTS}/${file}.xml
+            done < connectedDevicesList.txt
+            '''
+        }
+      }
+    }
+
+    stage('Compress Artifacts') {
+      steps {
+        dir('Source/Framework') {
+        sh 'zip -r "didm_auth_sdk_iOS.zip" ./*'
+        }
+      }
+    }
+
+  }
+
+post {
+  success {
+    junitReports()
+    publishArtifacts()
+    executeJob("iOS-DID-APP")
+  }
+  always {
+    notifyEmail()
+    notifyTeams()
+    sh '''
+    ideviceinstaller --uninstall net.easysol.didm-auth-sdk-app-iOS
+    rm -rf Source/DID_Auth_SDK/didm_auth_sdk_iOS/connectedDevicesList.txt'''
+  }
+}
+
+}
+
+def junitReports(){
+    dir('Source/DID_Auth_SDK/didm_auth_sdk_iOS') {
+        sh 'ls ${JUNIT_REPORTS} > rjunit'
+        def reports = readFile('rjunit').readLines()
+        reports.each { String report ->
+           junit JUNIT_REPORTS + "/" + report
+        }
+        sh 'rm -rf rjunit'
+    }
+}
+
+def publishArtifacts(){
+    if (BRANCH_NAME == "development") {
+        archiveArtifacts 'Source/Framework/*.zip'
+    }
+}
+
+def executeJob(def job){
+    if (BRANCH_NAME == "development") {
+        def job_build = job + "/${BRANCH_NAME}"
+        def params=[]
+        params.add(string(name:'object_kind', value:object_kind))
+        params.add(string(name:'user_name', value:user_name))
+        params.add(string(name:'user_email', value:user_email))
+        params.add(string(name:'total_commits_count', value:total_commits_count))
+        params.add(string(name:'commit_messages', value:commit_messages))
+        script {
+            build job : job_build, parameters:params, quietPeriod: 2, wait: false
+        }
+    }
+}
+
+def notifyEmail() {
+    emailext (
+        subject: '${BUILD_STATUS}: [IOS] ${JOB_NAME} Build #${BUILD_NUMBER}',
+        body: '''
+        Execution:
+            Request Type: ${object_kind}
+            By the user: ${user_name}
+            With the commits: ${commit_messages}
+
+        More information in the following link and check the Artifacts section: \n ${RUN_DISPLAY_URL}''',
+        to: user_email)
+}
+
+def notifyTeams(){
+      office365ConnectorSend webhookUrl: URL_TEAMS,
+            factDefinitions: [[name: "Request Type", template: '${object_kind}'],
+                             [name: "By the user", template: '${user_name}'],
+                             [name: "With the commits:", template: '${commit_messages}']]
+}
