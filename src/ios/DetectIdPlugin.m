@@ -18,6 +18,13 @@ CDVInvokedUrlCommand* lastCallback;
     //[[DetectID sdk] enableRegistrationServerResponseAlerts:false]; DEPRECATED
     [[DetectID sdk] enableSecureCertificateValidationProtocol:false];
     [[DetectID sdk] OTP_API];
+    
+    
+    // push
+    [[[DetectID sdk] PUSH_API] setPushTransactionOpenDelegate:self];
+    [[[DetectID sdk] PUSH_API] setPushTransactionServerResponseDelegate:self];
+    // end push
+
 }
 
 - (void)INIT:(CDVInvokedUrlCommand*)command {
@@ -47,7 +54,6 @@ CDVInvokedUrlCommand* lastCallback;
        // [[DetectID sdk] enableRegistrationServerResponseAlerts:false]; DEPRECATED
         [[DetectID sdk] enableSecureCertificateValidationProtocol:false];
 
-       // [[DetectID sdk] deviceRegistrationByCode:[command.arguments objectAtIndex:0]]; DEPRECATED
         NSString *finalURL = [NSString stringWithFormat:@"%@%@", @"https://otp.bancolombia.com/detect/public/registration/mobileServices.htm?code=", [command.arguments objectAtIndex:0]] ;
         [[DetectID sdk] didRegistrationWithUrl:finalURL];
         
@@ -279,5 +285,59 @@ CDVInvokedUrlCommand* lastCallback;
     formatter.dateFormat = @"MM/dd/yyyy, HH:mm:ss a";
     return [formatter stringFromDate:[self getDateFromEpochL:dateL]];
 }
+
+
+#pragma mark PUSH Notification.
+
+- (void)onPushTransactionOpen:(TransactionInfo *)transaction {
+    dispatch_async(dispatch_get_main_queue(), ^{
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle: [self buildTitle:transaction]
+    message: [self buildMessage:transaction]preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Confirm"
+        style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [[[DetectID sdk] PUSH_API] confirmPushTransactionAction:transaction];
+        }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Decline" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [[[DetectID sdk] PUSH_API] declinePushTransactionAction:transaction]; }]];
+        UIViewController *vc = self.viewController.view.window.rootViewController;
+        [vc presentViewController:alertController animated:YES completion:nil]; });
+        
+}
+
+
+- (void)onPushTransactionServerResponse:(NSString *)response {
+    NSString *message = [@"1020"isEqualToString:response] ? @"Device successfully authenticated" : @"Autenticación fallida"; [self showRegistrationMessage:message];
+}
+
+
+
+- (void)showRegistrationMessage:(NSString *)message { dispatch_async(dispatch_get_main_queue(), ^{
+UIAlertController * alertController = [UIAlertController alertControllerWithTitle: @"Respuesta de registro"
+message: message
+preferredStyle:UIAlertControllerStyleAlert];
+    UIViewController *vc = self.viewController.view.window.rootViewController;
+[vc presentViewController:alertController animated:YES completion:nil];
+    
+});
+    
+}
+
+- (NSString *)buildTitle:(TransactionInfo *)transactionInfo { if (transactionInfo) {
+NSMutableString *title = [NSMutableString string];
+[title appendString:transactionInfo.account.organizationName]; [title appendString:@"\n"];
+[title appendString:transactionInfo.subject];
+return title;
+}
+return @"";
+}
+
+
+- (NSString *)buildMessage:(TransactionInfo *)transactionInfo { if (transactionInfo) {
+NSMutableString *message = [NSMutableString string]; [message appendString:@"message :"];
+[message appendString:transactionInfo.message]; return message;
+}
+return @"";
+}
+ // END Push notification
 
 @end

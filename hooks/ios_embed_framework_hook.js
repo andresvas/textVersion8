@@ -106,10 +106,14 @@ module.exports = function (ctx) {
     var proj = xcode.project(projectPath);
     proj.parseSync();
 
-    addFramework("did_sdk_tokens_ios.framework",proj);
+    //addFramework("did_sdk_tokens_ios.framework",proj);
     addFramework("did_sdk_data_ios.framework",proj);
     addFramework("did_sdk_encrypt_iOS.framework",proj);
     addFramework("didm_auth_sdk_iOS.framework",proj);
+    
+    addFramework("did_sdk_challengeotp_ios.framework",proj);
+    addFramework("did_sdk_server_communication_iOS.framework",proj);
+
 
     fs.writeFile(proj.filepath, proj.writeSync(), 'utf8', function (err) {
         if (err) {

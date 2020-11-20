@@ -3,7 +3,8 @@
 #import <Cordova/CDVPlugin.h>
 #import <didm_auth_sdk_iOS/didm_auth_sdk_iOS.h>
 
-@interface DetectIdPlugin : CDVPlugin
+@interface DetectIdPlugin : CDVPlugin <PushTransactionOpenDelegate,PushTransactionServerResponseDelegate>
+
 - (void)INIT:(CDVInvokedUrlCommand*)command;
 - (void)REGISTER_DEVICE_BY_CODE:(CDVInvokedUrlCommand*)command;
 

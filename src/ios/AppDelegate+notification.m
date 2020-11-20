@@ -8,7 +8,7 @@
 #import "AppDelegate+notification.h"
 //#import "PushPlugin.h"
 #import <objc/runtime.h>
-//#import <didm_auth_sdk_iOS/didm_auth_sdk_iOS.h>
+#import <didm_auth_sdk_iOS/didm_auth_sdk_iOS.h>
 
 
 #define kApplicationInBackgroundKey @"applicationInBackground"
@@ -37,9 +37,20 @@
             
         }
     }];
+    
+    [center setNotificationCategories:[[DetectID sdk]
+    getUNNotificationActionCategoriesForNotifications]];
+
+    
+    /*UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound) categories:[[DetectID sdk] getNotificationActionCategoriesForNotifications] ];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];*/
 
 
-
+ // add methods  enable and disable  characteristic
+    //[[DetectID sdk] enableRegistrationServerResponseAlerts:NO];
+    [[[DetectID sdk] PUSH_API]enablePushAlertDefaultDialog:YES];
+    [[[DetectID sdk] PUSH_API]enablePushTransactionDefaultDialog:YES];
+    [[[DetectID sdk] PUSH_API]enablePushTransactionDefaultDialog:YES];
     
     
     return YES;
@@ -47,13 +58,19 @@
 
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
+    
+    [[DetectID sdk] subscribePayload:notification withCompletionHandler:completionHandler];
+    
 }
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)())completionHandler{
+    
+    [[DetectID sdk] handleActionWithIdentifier:response];
+    
 }
 
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-       NSLog(@"VASQUEZ: %@", [self stringWithDeviceToken:deviceToken]);
+      /* NSLog(@"VASQUEZ: %@", [self stringWithDeviceToken:deviceToken]);
 
        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     pasteboard.string = [self stringWithDeviceToken:deviceToken];
@@ -74,7 +91,10 @@
     }]];
 
     [topWindow makeKeyAndVisible];
-    [topWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+    [topWindow.rootViewController presentViewController:alert animated:YES completion:nil];*/
+    
+    
+    [[DetectID sdk] receivePushServiceId:deviceToken];
     
 }
 
@@ -112,17 +132,18 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
 
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{ [[DetectID sdk]subscribePayload:userInfo];
     });
 }
 
 
 - (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo completionHandler:(void (^)(void))completionHandler{
 
+    [[DetectID sdk] handleActionWithIdentifier:identifier forNotification:userInfo];
+    
 completionHandler();
 
 }
 
 @end
-
 

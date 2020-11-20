@@ -115,7 +115,7 @@
         <header-file src="src/ios/AppDelegate+notification.h" />
         <source-file src="src/ios/AppDelegate+notification.m" />
 
-        <framework src="src/ios/detectIdSdk/did_sdk_tokens_ios.framework" custom="true" embed="true"/>
+       <!-- <framework src="src/ios/detectIdSdk/did_sdk_tokens_ios.framework" custom="true" embed="true"/>-->
         <framework src="src/ios/detectIdSdk/did_sdk_encrypt_iOS.framework" custom="true" embed="true"/>
         <framework src="src/ios/detectIdSdk/did_sdk_data_ios.framework" custom="true" embed="true"/>
         <framework src="src/ios/detectIdSdk/didm_auth_sdk_iOS.framework" custom="true" embed="true"/>
